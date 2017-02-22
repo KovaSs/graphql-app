@@ -1,9 +1,16 @@
-const { GraphQLString, GraphQLObjectType, GraphQLSchema } = require('graphql');
+const { GraphQLString, GraphQLID, GraphQLObjectType, GraphQLSchema } = require('graphql');
+
+const movies = [
+	{ id: '1', name: 'Pulp Fiction', genre: 'Crime' },
+	{ id: '2', name: '1984', genre: 'Sci-Fi' },
+	{ id: 3, name: 'V for vendetta', genre: 'Sci-Fi-Triller' },
+	{ id: 4, name: 'Snatch', genre: 'Crime-Comedy' },
+];
 
 const MovieType = new GraphQLObjectType({
   name: 'Movie',
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: GraphQLID },
     name: { type: GraphQLString },
     genre: { type: GraphQLString },
   }),
@@ -14,9 +21,10 @@ const Query = new GraphQLObjectType({
   fields: {
     movie: {
       type: MovieType,
-      args: { id: { type: GraphQLString } },
+      args: { id: { type: GraphQLID } },
       resolve(parent, args) {
-
+        console.log('movie', { parent, args })
+        return movies.find(movie => movie.id == args.id)
       },
     },
   }
