@@ -4,7 +4,8 @@ const {
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
-  GraphQLSchema
+  GraphQLSchema,
+  GraphQLNonNull,
 } = require('graphql');
 const models = require('../models');
 
@@ -60,7 +61,7 @@ const Mutation = new GraphQLObjectType({
       args: { 
         name: { type: GraphQLString },
         genre: { type: GraphQLString },
-        directorId: { type: GraphQLID },
+        directorId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(_, args) {
         const movie = new models.Movies({
@@ -71,6 +72,54 @@ const Mutation = new GraphQLObjectType({
         return movie.save();
       },
     },
+    deleteDirector: {
+      type: DirectorType,
+      args: { 
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(_, args) {
+        return models.Directors.findByIdAndRemove(args.id);
+      },
+    },
+    deleteMovie: {
+      type: MovieType,
+      args: { 
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(_, args) {
+        return models.Movies.findByIdAndRemove(args.id);
+      },
+    },
+    updateDirector: {
+      type: DirectorType,
+      args: { 
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        name: { type: GraphQLString },
+        age: { type: GraphQLInt },
+      },
+      resolve(_, args) {
+        return models.Directors.findByIdAndUpdate(args.id, 
+          { $set: { name: args.name, age: args.age } },
+          { new: true }
+        );
+      },
+    },
+    updateMovie: {
+      type: MovieType,
+      args: { 
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        name: { type: GraphQLString },
+        genre: { type: GraphQLString },
+        directorId: { type: GraphQLID },
+      },
+      resolve(_, args) {
+        const { id: movieId, ...movieProps } = args;
+        return models.Movies.findByIdAndUpdate(movieId, 
+          { $set: { ...movieProps } },
+          { new: true }
+        );
+      },
+    },
   }
 });
 
@@ -79,14 +128,14 @@ const Query = new GraphQLObjectType({
   fields: {
     movie: {
       type: MovieType,
-      args: { id: { type: GraphQLID } },
+      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(_, args) {
         return models.Movies.findById(args.id);
       },
     },
     director: {
       type: DirectorType,
-      args: { id: { type: GraphQLID } },
+      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(_, args) {
         return models.Directors.findById(args.id);
       },
