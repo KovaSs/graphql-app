@@ -17,7 +17,7 @@ mongoose.connect(config.DB_URL, {
   useCreateIndex: true,
 })
 .then(() => console.log('💾 Mongo DB. Connected...'))
-.catch((err) => console.log('❌Mongo DB. Error', err))
+.catch((err) => console.log('❌ Mongo DB. Error', err))
 
 app.use('/graphql', graphqlHTTP({
   schema,
@@ -25,5 +25,5 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 app.listen(PORT, err => {
-  err ? console.log(err) : console.log('Server started!');
+  err ? console.log(err) : console.log('📡 Server. started!');
 });
